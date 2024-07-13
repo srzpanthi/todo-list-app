@@ -5,12 +5,31 @@ import './App.css';
 function App() {
   const [todos, setTodos] = useState([]);
   const [input, setInput] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentTodo, setCurrentTodo] = useState(null);
 
   const addTodo = () => {
     if (input.trim()) {
       setTodos([...todos, { text: input, id: Date.now() }]);
       setInput('');
     }
+  };
+
+  const editTodo = (todo) => {
+    setIsEditing(true);
+    setCurrentTodo(todo);
+    setInput(todo.text);
+  };
+
+  const saveTodo = () => {
+    setTodos(
+      todos.map((todo) =>
+        todo.id === currentTodo.id ? { ...todo, text: input } : todo
+      )
+    );
+    setIsEditing(false);
+    setCurrentTodo(null);
+    setInput('');
   };
 
   return (
@@ -22,9 +41,11 @@ function App() {
           onChange={(e) => setInput(e.target.value)}
           placeholder="Add a task..."
         />
-        <button onClick={addTodo}>Add</button>
+        <button onClick={isEditing ? saveTodo : addTodo}>
+          {isEditing ? 'Save' : 'Add'}
+        </button>
       </div>
-      <TodoList todos={todos} />
+      <TodoList todos={todos} setTodos={setTodos} editTodo={editTodo} />
     </div>
   );
 }
